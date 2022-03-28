@@ -70,7 +70,7 @@ class EncoderDecoder(nn.Module):
 
                     self.train()
 
-            self.save_model(epoch)
+            self.save(epoch)
 
     def predict(self, features_tensors, dataset):
         self.eval()
