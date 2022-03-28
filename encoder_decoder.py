@@ -31,7 +31,8 @@ class EncoderDecoder(nn.Module):
             attention_dim=attention_dim,
             encoder_dim=encoder_dim,
             decoder_dim=decoder_dim,
-            dropout=dropout
+            dropout=dropout,
+            device=device
         )
 
     def forward(self, images, captions):
