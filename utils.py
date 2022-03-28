@@ -1,9 +1,12 @@
 import matplotlib.pyplot as plt
-from torch import cat
+from torch import cat, cuda
+from torch import device as torch_device
 from torch.nn.utils.rnn import pad_sequence
 
 MAGIC_MU = [0.485, 0.456, 0.406]
 MAGIC_SIGMA = [0.229, 0.224, 0.225]
+
+DEVICE = torch_device('cuda:0' if cuda.is_available() else "cpu")
 
 
 def collate(batch, pad_idx):

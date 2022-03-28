@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch import device
+
+from utils import DEVICE
 
 
 class Attention(nn.Module):
@@ -31,10 +32,9 @@ class Attention(nn.Module):
 
 
 class DecoderRNN(nn.Module):
-    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, device, dropout=0.2):
+    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, dropout=0.2):
         super().__init__()
 
-        self.device = device
         self.vocab_size = vocab_size
 
         self.embedding = nn.Embedding(vocab_size, embed_size)
@@ -67,8 +67,8 @@ class DecoderRNN(nn.Module):
         batch_size = captions.size(0)
         num_features = features.size(1)
 
-        preds = torch.zeros(batch_size, seq_length, self.vocab_size).to(self.device)
-        alphas = torch.zeros(batch_size, seq_length, num_features).to(self.device)
+        preds = torch.zeros(batch_size, seq_length, self.vocab_size).to(DEVICE)
+        alphas = torch.zeros(batch_size, seq_length, num_features).to(DEVICE)
 
         for s in range(seq_length):
             alpha, context = self.attention(features, h)
@@ -86,7 +86,7 @@ class DecoderRNN(nn.Module):
         batch_size = features.size(0)
         h, c = self.init_hidden_state(features)  # (batch, decoder_dim)
 
-        word = torch.tensor(word2idx['<START>']).view(1, -1).to(self.device)
+        word = torch.tensor(word2idx['<START>']).view(1, -1).to(DEVICE)
         embeds = self.embedding(word)
 
         alphas, captions = list(), list()

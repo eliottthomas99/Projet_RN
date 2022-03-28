@@ -1,12 +1,10 @@
 import torch.nn as nn
 import torch.optim as optim
-from torch import cuda
-from torch import device as torch_device
 from torch.utils.data import DataLoader
 
 from data_loader import DatasetLoader
 from encoder_decoder import EncoderDecoder
-from utils import collate
+from utils import DEVICE, collate
 
 PATH = "flickr8k/"
 NORMALISE = True
@@ -44,8 +42,7 @@ def main():
         collate_fn=lambda batch: collate(batch, pad_idx)
     )
 
-    device = torch_device('cuda:0' if cuda.is_available() else "cpu")
-    print("device:", device)
+    print("device:", DEVICE)
 
     # Initialize model
     model = EncoderDecoder(
@@ -54,10 +51,9 @@ def main():
         attention_dim=attention_dim,
         encoder_dim=encoder_dim,
         decoder_dim=decoder_dim,
-        device=device,
         normalise=NORMALISE,
         extractor=extractor
-    ).to(device)
+    ).to(DEVICE)
 
     # Loss and optimizer
     loss_criterion = nn.CrossEntropyLoss(ignore_index=pad_idx)

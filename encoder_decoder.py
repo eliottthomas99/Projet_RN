@@ -1,16 +1,15 @@
 from datetime import datetime
-from time import strftime
 
 import torch
 import torch.nn as nn
 
 from decoder import DecoderRNN
 from encoder import EncoderCNN
-from utils import show_image
+from utils import DEVICE, show_image
 
 
 class EncoderDecoder(nn.Module):
-    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, device, normalise=False, extractor="vgg", dropout=0.2):
+    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, normalise=False, extractor="vgg", dropout=0.2):
         super().__init__()
 
         self.embed_size = embed_size
@@ -18,7 +17,6 @@ class EncoderDecoder(nn.Module):
         self.attention_dim = attention_dim
         self.encoder_dim = encoder_dim
         self.decoder_dim = decoder_dim
-        self.device = device
         self.normalise = normalise
         self.extractor = extractor
         self.fit_date = None
@@ -31,8 +29,7 @@ class EncoderDecoder(nn.Module):
             attention_dim=attention_dim,
             encoder_dim=encoder_dim,
             decoder_dim=decoder_dim,
-            dropout=dropout,
-            device=device
+            dropout=dropout
         )
 
     def forward(self, images, captions):
@@ -45,7 +42,7 @@ class EncoderDecoder(nn.Module):
         self.fit_date = datetime.now().strftime("%Y_%m_%d_%H_%M")
         for epoch in range(1, epochs + 1):
             for idx, (image, captions) in enumerate(iter(data_loader)):
-                image, captions = image.to(self.device), captions.to(self.device)
+                image, captions = image.to(DEVICE), captions.to(DEVICE)
 
                 # Zero the gradients
                 optimizer.zero_grad()
@@ -77,7 +74,7 @@ class EncoderDecoder(nn.Module):
     def predict(self, features_tensors, dataset):
         self.eval()
         with torch.no_grad():
-            features = self.encoder(features_tensors[0:1].to(self.device))
+            features = self.encoder(features_tensors[0:1].to(DEVICE))
             caps, alphas = self.decoder.predict_caption(features, word2idx=dataset.word2idx, idx2word=dataset.idx2word)
             caption = ' '.join(caps)
             show_image(features_tensors[0], self.normalise, title=caption)
