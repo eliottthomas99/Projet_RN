@@ -7,7 +7,7 @@ from utils import show_image
 
 
 class EncoderDecoder(nn.Module):
-    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, device, dropout=0.2):
+    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, device, normalise=False, extractor="vgg", dropout=0.2):
         super().__init__()
 
         self.embed_size = embed_size
@@ -16,6 +16,7 @@ class EncoderDecoder(nn.Module):
         self.encoder_dim = encoder_dim
         self.decoder_dim = decoder_dim
         self.device = device
+        self.normalise = normalise
 
         self.encoder = EncoderCNN()
 
@@ -72,7 +73,7 @@ class EncoderDecoder(nn.Module):
             features = self.encoder(features_tensors[0:1].to(self.device))
             caps, alphas = self.decoder.predict_caption(features, word2idx=dataset.word2idx, idx2word=dataset.idx2word)
             caption = ' '.join(caps)
-            show_image(features_tensors[0], title=caption)
+            show_image(features_tensors[0], self.normalise, title=caption)
 
         return caps, alphas
 

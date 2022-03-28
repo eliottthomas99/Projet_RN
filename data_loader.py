@@ -7,6 +7,8 @@ from torch import tensor
 from torch.utils.data import Dataset
 from torchvision import transforms
 
+from utils import MAGIC_MU, MAGIC_SIGMA
+
 
 class DatasetLoader(Dataset):
 
@@ -15,8 +17,6 @@ class DatasetLoader(Dataset):
         self.df = pd.read_csv(captions_file)
 
         self.normalise = normalise
-        self.magic_mu = [0.485, 0.456, 0.406]
-        self.magic_sigma = [0.229, 0.224, 0.225]
 
         self.imgs = self.df["image"]
         self.captions = self.df["caption"]
@@ -43,11 +43,13 @@ class DatasetLoader(Dataset):
 
         if self.normalise:
             for c in range(3):
-                img[c] -= self.magic_mu[c]
-                img[c] /= self.magic_sigma[c]
+                img[c] -= MAGIC_MU[c]
+                img[c] /= MAGIC_SIGMA[c]
 
         # Captions
-        caption = tensor([self.word2idx["<START>"]] + self.tokenise(caption) + [self.word2idx["<END>"]])
+        caption = tensor([self.word2idx["<START>"]] +
+                         self.tokenise(caption) +
+                         [self.word2idx["<END>"]])
 
         return img, caption
 

@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 from torch import cat
 from torch.nn.utils.rnn import pad_sequence
 
+MAGIC_MU = [0.485, 0.456, 0.406]
+MAGIC_SIGMA = [0.229, 0.224, 0.225]
+
 
 def collate(batch, pad_idx):
     images = [item[0].unsqueeze(0) for item in batch]
@@ -12,13 +15,13 @@ def collate(batch, pad_idx):
     return images, captions
 
 
-def show_image(img, title=None):
+def show_image(img, normalise, title=None):
     # Unnormalise
-    img[0] = img[0] * 0.229 + 0.485
-    img[1] = img[1] * 0.224 + 0.456
-    img[2] = img[2] * 0.225 + 0.406
+    if normalise:
+        for i in range(3):
+            img[i] *= MAGIC_SIGMA[i]
+            img[i] += MAGIC_MU[i]
 
-    print(img.shape)
     img = img.numpy().transpose((1, 2, 0))
 
     if title is not None:

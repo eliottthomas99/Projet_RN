@@ -9,6 +9,7 @@ from encoder_decoder import EncoderDecoder
 from utils import collate
 
 PATH = "flickr8k/"
+NORMALISE = True
 
 # Hyperparameters
 batch_size = 20
@@ -22,7 +23,9 @@ epochs = 10
 
 def main():
     # Load data
-    dataset = DatasetLoader(img_path=PATH + "Images/", captions_file=PATH + "captions.txt")
+    dataset = DatasetLoader(img_path=PATH + "Images/",
+                            captions_file=PATH + "captions.txt",
+                            normalise=NORMALISE)
     dataset.build_vocab()
 
     vocab_size = len(dataset.word2idx)
@@ -46,7 +49,8 @@ def main():
         attention_dim=attention_dim,
         encoder_dim=encoder_dim,
         decoder_dim=decoder_dim,
-        device=device
+        device=device,
+        normalise=NORMALISE,
     ).to(device)
 
     # Loss and optimizer
