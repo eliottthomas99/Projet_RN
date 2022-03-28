@@ -21,6 +21,7 @@ class EncoderDecoder(nn.Module):
         self.device = device
         self.normalise = normalise
         self.extractor = extractor
+        self.fit_date = None
 
         self.encoder = EncoderCNN(extractor)
 
@@ -40,6 +41,7 @@ class EncoderDecoder(nn.Module):
         return outputs
 
     def fit(self, data_loader, dataset, optimizer, loss_criterion, epochs):
+        self.fit_date = datetime.now().strftime("%Y_%m_%d_%H_%M")
         for epoch in range(1, epochs + 1):
             for idx, (image, captions) in enumerate(iter(data_loader)):
                 image, captions = image.to(self.device), captions.to(self.device)
@@ -60,7 +62,7 @@ class EncoderDecoder(nn.Module):
                 # Update the optimizer
                 optimizer.step()
 
-                if (idx + 1) % 100 == 0:
+                if idx % 500 == 0:
                     print(f"Epoch: {epoch} loss: {loss.item():.5f}")
 
                     # Generate the caption
@@ -92,6 +94,5 @@ class EncoderDecoder(nn.Module):
             "state_dict": self.state_dict()
         }
 
-        date = datetime.now().strftime("%Y_%m_%d_%H_%M")
-        save_name = f"{self.extractor}_{date}.pth"
+        save_name = f"{self.extractor}_{self.fit_date}.pth"
         torch.save(model_state, save_name)

@@ -17,7 +17,7 @@ ENCODER_DIMS = {
 
 # Hyperparameters
 extractor = "vgg"
-batch_size = 20
+batch_size = 32
 embed_size = 300
 attention_dim = 256
 encoder_dim = ENCODER_DIMS[extractor]
