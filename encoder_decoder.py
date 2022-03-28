@@ -1,3 +1,6 @@
+from datetime import datetime
+from time import strftime
+
 import torch
 import torch.nn as nn
 
@@ -89,4 +92,6 @@ class EncoderDecoder(nn.Module):
             "state_dict": self.state_dict()
         }
 
-        torch.save(model_state, "attention_model_state.pth")
+        date = datetime.now().strftime("%Y_%m_%d_%H_%M")
+        save_name = f"{self.extractor}_{date}.pth"
+        torch.save(model_state, save_name)
