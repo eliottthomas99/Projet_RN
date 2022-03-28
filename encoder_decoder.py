@@ -60,12 +60,13 @@ class EncoderDecoder(nn.Module):
                 # Update the optimizer
                 optimizer.step()
 
-                if idx % 500 == 0:
+                if idx % 100 == 0:
                     print(f"Epoch: {epoch} loss: {loss.item():.5f}")
 
-                    # Generate the caption
-                    img, _ = next(iter(data_loader))
-                    self.predict(img, dataset)
+                    if idx % 500 == 0:
+                        # Generate the caption
+                        img, _ = next(iter(data_loader))
+                        self.predict(img, dataset)
 
                     self.train()
 
