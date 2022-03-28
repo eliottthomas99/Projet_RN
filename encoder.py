@@ -3,7 +3,7 @@ import torchvision.models as models
 
 
 class EncoderCNN(nn.Module):
-    def __init__(self, model="resnet"):
+    def __init__(self, model="vgg"):
         super(EncoderCNN, self).__init__()
 
         if model == "vgg":

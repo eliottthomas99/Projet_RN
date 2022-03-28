@@ -17,8 +17,9 @@ class EncoderDecoder(nn.Module):
         self.decoder_dim = decoder_dim
         self.device = device
         self.normalise = normalise
+        self.extractor = extractor
 
-        self.encoder = EncoderCNN()
+        self.encoder = EncoderCNN(extractor)
 
         self.decoder = DecoderRNN(
             embed_size=embed_size,
@@ -44,7 +45,7 @@ class EncoderDecoder(nn.Module):
                 optimizer.zero_grad()
 
                 # Feed forward
-                outputs, attentions = self.forward(image, captions)
+                outputs, _ = self.forward(image, captions)
 
                 # Loss
                 targets = captions[:, 1:]

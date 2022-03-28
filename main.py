@@ -10,12 +10,17 @@ from utils import collate
 
 PATH = "flickr8k/"
 NORMALISE = True
+ENCODER_DIMS = {
+    "vgg": 512,
+    "resnet": 2048
+}
 
 # Hyperparameters
+extractor = "vgg"
 batch_size = 20
 embed_size = 300
 attention_dim = 256
-encoder_dim = 2048
+encoder_dim = ENCODER_DIMS[extractor]
 decoder_dim = 512
 learning_rate = 1e-3
 epochs = 10
@@ -51,6 +56,7 @@ def main():
         decoder_dim=decoder_dim,
         device=device,
         normalise=NORMALISE,
+        extractor=extractor
     ).to(device)
 
     # Loss and optimizer
