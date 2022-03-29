@@ -95,3 +95,7 @@ class EncoderDecoder(nn.Module):
 
         save_name = f"{self.extractor}_{self.fit_date}.pth"
         torch.save(model_state, save_name)
+
+    def load(self, saved_path):
+        model_dict = torch.load(saved_path)
+        self.load_state_dict(model_dict["state_dict"])
