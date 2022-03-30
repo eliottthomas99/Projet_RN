@@ -12,3 +12,6 @@ __pycache__/
 env/
 venv/
 ENV/
+
+# Data
+flickr8k
