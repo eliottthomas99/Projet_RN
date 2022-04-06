@@ -64,6 +64,9 @@ def main():
     model.load("vgg_2022_04_06_14_01.pth")
     model.fit(data_loader, optimizer, ce_loss, dataset.word2idx, dataset.idx2word)
 
+    
+    #model.display_attention(data_loader, dataset.word2idx, dataset.idx2word)
+
 
 if __name__ == "__main__":
     main()

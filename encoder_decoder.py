@@ -5,7 +5,7 @@ import torch.nn as nn
 
 from decoder import DecoderRNN
 from encoder import EncoderCNN
-from utils import DEVICE, show_image
+from utils import DEVICE, show_image, plot_attention
 
 
 class EncoderDecoder(nn.Module):
@@ -83,6 +83,15 @@ class EncoderDecoder(nn.Module):
             show_image(features_tensors[0], self.normalise, title=' '.join(captions))
 
         return captions, alphas
+    
+    def display_attention(self, data_loader, word2idx, idx2word):
+        images, _ = next(iter(data_loader))
+
+        img = images[0].detach().clone()
+        captions, alphas = self.predict(img.unsqueeze(0), word2idx, idx2word)
+
+        img = images[0].detach().clone()
+        plot_attention(img, captions, alphas, self.normalise)
 
     def save(self, num_epochs):
         model_state = {

@@ -31,3 +31,29 @@ def show_image(img, normalise, title=None):
         plt.title(title)
     plt.imshow(img)
     plt.pause(1e-3)
+
+
+def plot_attention(img, caption, alphas, normalise=False):
+    # Unnormalise
+    if normalise:
+        for i in range(3):
+            img[i] *= MAGIC_SIGMA[i]
+            img[i] += MAGIC_MU[i]
+    
+    img = img.numpy().transpose((1, 2, 0))
+    img_cpy = img
+
+    fig = plt.figure(figsize=(15, 15))
+
+    len_caption = len(caption)
+    for l in range(len_caption):
+        att = alphas[l].reshape(7, 7)
+        
+        ax = fig.add_subplot(len_caption // 2, len_caption // 2, l+1)
+        ax.set_title(caption[l])
+        img = ax.imshow(img_cpy)
+        ax.imshow(att, cmap='gray', alpha=0.7, extent=img.get_extent())
+        
+
+    plt.tight_layout()
+    plt.show()
