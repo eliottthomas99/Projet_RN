@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from skimage.transform import pyramid_expand
 from torch import cat, cuda
 from torch import device as torch_device
 from torch.nn.utils.rnn import pad_sequence
@@ -48,6 +49,7 @@ def plot_attention(img, caption, alphas, normalise=False, features_dims=7):
     len_caption = len(caption)
     for l in range(len_caption):
         att = alphas[l].reshape(features_dims, features_dims)
+        att = pyramid_expand(att, upscale=24, sigma=8)
         
         ax = fig.add_subplot(len_caption // 2, len_caption // 2, l+1)
         ax.set_title(caption[l])
