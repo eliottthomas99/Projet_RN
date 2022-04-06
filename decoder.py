@@ -82,7 +82,7 @@ class DecoderRNN(nn.Module):
 
         return preds, alphas
 
-    def predict_caption(self, features, max_len=20, word2idx=None, idx2word=None):
+    def predict_caption(self, features, word2idx=None, idx2word=None, max_len=20):
         batch_size = features.size(0)
         h, c = self.init_hidden_state(features)  # (batch, decoder_dim)
 

@@ -52,15 +52,17 @@ def main():
         encoder_dim=encoder_dim,
         decoder_dim=decoder_dim,
         normalise=NORMALISE,
-        extractor=extractor
+        extractor=extractor,
+        n_epochs=epochs
     ).to(DEVICE)
 
     # Loss and optimizer
-    loss_criterion = nn.CrossEntropyLoss(ignore_index=pad_idx)
+    ce_loss = nn.CrossEntropyLoss(ignore_index=pad_idx)
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     # Train model
-    model.fit(data_loader, dataset, optimizer, loss_criterion, epochs)
+    model.load("vgg_2022_04_06_14_01.pth")
+    model.fit(data_loader, optimizer, ce_loss, dataset.word2idx, dataset.idx2word)
 
 
 if __name__ == "__main__":
