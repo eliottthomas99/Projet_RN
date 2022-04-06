@@ -8,9 +8,15 @@ from utils import DEVICE, collate
 
 PATH = "flickr8k/"
 NORMALISE = True
-ENCODER_DIMS = {
-    "vgg": 512,
-    "resnet": 2048
+MODEL_PARAMS = {
+    "encoder_channels": {
+        "vgg": 512,
+        "resnet": 2048
+    },
+    "features_dims": {
+        "vgg": 7,
+        "resnet": 8
+    }
 }
 
 # Hyperparameters
@@ -18,7 +24,7 @@ extractor = "vgg"
 batch_size = 32
 embed_size = 300
 attention_dim = 256
-encoder_dim = ENCODER_DIMS[extractor]
+encoder_dim = MODEL_PARAMS["encoder_channels"][extractor]
 decoder_dim = 512
 learning_rate = 1e-3
 epochs = 10
@@ -65,7 +71,7 @@ def main():
     model.fit(data_loader, optimizer, ce_loss, dataset.word2idx, dataset.idx2word)
 
     
-    #model.display_attention(data_loader, dataset.word2idx, dataset.idx2word)
+    #model.display_attention(data_loader, dataset.word2idx, dataset.idx2word, features_dims=MODEL_PARAMS["features_dims"][extractor])
 
 
 if __name__ == "__main__":

@@ -33,7 +33,7 @@ def show_image(img, normalise, title=None):
     plt.pause(1e-3)
 
 
-def plot_attention(img, caption, alphas, normalise=False):
+def plot_attention(img, caption, alphas, normalise=False, features_dims=7):
     # Unnormalise
     if normalise:
         for i in range(3):
@@ -47,13 +47,12 @@ def plot_attention(img, caption, alphas, normalise=False):
 
     len_caption = len(caption)
     for l in range(len_caption):
-        att = alphas[l].reshape(7, 7)
+        att = alphas[l].reshape(features_dims, features_dims)
         
         ax = fig.add_subplot(len_caption // 2, len_caption // 2, l+1)
         ax.set_title(caption[l])
         img = ax.imshow(img_cpy)
         ax.imshow(att, cmap='gray', alpha=0.7, extent=img.get_extent())
-        
-
+    
     plt.tight_layout()
     plt.show()
