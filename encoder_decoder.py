@@ -7,6 +7,8 @@ from decoder import DecoderRNN
 from encoder import EncoderCNN
 from utils import DEVICE, show_image, plot_attention
 
+from nltk.translate.bleu_score import sentence_bleu
+
 
 class EncoderDecoder(nn.Module):
     def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, n_epochs, normalise=False, extractor="vgg", dropout=0.2):
@@ -40,10 +42,10 @@ class EncoderDecoder(nn.Module):
 
         return outputs
 
-    def fit(self, data_loader, optimizer, loss_criterion, word2idx, idx2word):
+    def fit(self, data_loader, optimizer, loss_criterion, dataset):
         self.fit_date = datetime.now().strftime("%Y_%m_%d_%H_%M")
         for epoch in range(self.curr_epoch, self.n_epochs + 1):
-            for idx, (batch_images, batch_captions) in enumerate(iter(data_loader)):
+            for idx, (batch_images, batch_captions, _) in enumerate(iter(data_loader)):
                 batch_images, batch_captions = batch_images.to(DEVICE), batch_captions.to(DEVICE)
 
                 # Zero the gradients
@@ -68,24 +70,30 @@ class EncoderDecoder(nn.Module):
 
                     if idx % 500 == 0:
                         # Generate the caption
-                        img, _ = next(iter(data_loader))
-                        self.predict(img, word2idx, idx2word)
+                        img, _, img_name = next(iter(data_loader))
+                        self.predict(img, dataset=dataset, img_name=img_name)
 
                     self.train()
 
             self.save(epoch)
 
-    def predict(self, features_tensors, word2idx, idx2word):
+    def predict(self, features_tensors, dataset, img_name):
         self.eval()
         with torch.no_grad():
             features = self.encoder(features_tensors[0:1].to(DEVICE))
-            captions, alphas = self.decoder.predict_caption(features, word2idx, idx2word)
-            show_image(features_tensors[0], self.normalise, title=' '.join(captions))
+            captions, alphas = self.decoder.predict_caption(features, dataset.word2idx, dataset.idx2word)
+
+
+            captions_ref = dataset.df[dataset.df["image"] == img_name[0]]["caption"]
+            captions_ref = [ caption.split() for caption in captions]
+            bleu_score = sentence_bleu(captions_ref, captions)
+
+            show_image(features_tensors[0], self.normalise, title=' '.join(captions)+f"\nBLEU score: {bleu_score:.2f}")
 
         return captions, alphas
     
     def display_attention(self, data_loader, word2idx, idx2word, features_dims):
-        images, _ = next(iter(data_loader))
+        images, _, _ = next(iter(data_loader))
 
         img = images[0].detach().clone()
         captions, alphas = self.predict(img.unsqueeze(0), word2idx, idx2word)

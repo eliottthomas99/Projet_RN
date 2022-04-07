@@ -16,7 +16,9 @@ def collate(batch, pad_idx):
 
     captions = [item[1] for item in batch]
     captions = pad_sequence(captions, batch_first=True, padding_value=pad_idx)
-    return images, captions
+
+    img_names = [item[2] for item in batch]
+    return images, captions , img_names
 
 
 def show_image(img, normalise, title=None):

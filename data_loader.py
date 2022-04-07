@@ -51,7 +51,8 @@ class DatasetLoader(Dataset):
                          self.tokenise(caption) +
                          [self.word2idx["<END>"]])
 
-        return img, caption
+        
+        return img, caption , img_name
 
     def build_vocab(self):
         curr_idx = len(self.word2idx)
