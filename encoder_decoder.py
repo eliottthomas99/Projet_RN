@@ -84,14 +84,14 @@ class EncoderDecoder(nn.Module):
 
         return captions, alphas
     
-    def display_attention(self, data_loader, word2idx, idx2word):
+    def display_attention(self, data_loader, word2idx, idx2word, features_dims):
         images, _ = next(iter(data_loader))
 
         img = images[0].detach().clone()
         captions, alphas = self.predict(img.unsqueeze(0), word2idx, idx2word)
 
         img = images[0].detach().clone()
-        plot_attention(img, captions, alphas, self.normalise)
+        plot_attention(img, captions, alphas, self.normalise, features_dims)
 
     def save(self, num_epochs):
         model_state = {

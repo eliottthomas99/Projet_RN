@@ -10,17 +10,19 @@ PATH = "flickr8k/"
 NORMALISE = True
 MODEL_PARAMS = {
     "encoder_channels": {
-        "vgg": 512,
-        "resnet": 2048
+        "vgg16": 512,
+        "resnet50": 2048,
+        "inception_v3": 2048
     },
     "features_dims": {
-        "vgg": 7,
-        "resnet": 8
+        "vgg16": 7,
+        "resnet50": 8,
+        "inception_v3": 8
     }
 }
 
 # Hyperparameters
-extractor = "vgg"
+extractor = "vgg16"
 batch_size = 32
 embed_size = 300
 attention_dim = 256
@@ -67,10 +69,10 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     # Train model
-    model.load("vgg_2022_04_06_14_01.pth")
+    # model.load("vgg_2022_04_06_14_01.pth")
     model.fit(data_loader, optimizer, ce_loss, dataset.word2idx, dataset.idx2word)
 
-    
+    # Display attentions
     #model.display_attention(data_loader, dataset.word2idx, dataset.idx2word, features_dims=MODEL_PARAMS["features_dims"][extractor])
 
 

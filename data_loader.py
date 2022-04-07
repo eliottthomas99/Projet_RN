@@ -12,7 +12,7 @@ from utils import MAGIC_MU, MAGIC_SIGMA
 
 class DatasetLoader(Dataset):
 
-    def __init__(self, img_path, captions_file, normalise=False):
+    def __init__(self, img_path, captions_file, normalise=False, img_size=299):
         self.img_path = img_path
         self.df = pd.read_csv(captions_file)
 
@@ -26,7 +26,7 @@ class DatasetLoader(Dataset):
         self.idx2word = {i: w for w, i in self.word2idx.items()}
 
         self.transform = transforms.Compose([
-            transforms.Resize((250, 250)),
+            transforms.Resize((img_size, img_size)),
             transforms.ToTensor()  # scale image to [0,1]
         ])
 
