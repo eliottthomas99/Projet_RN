@@ -4,3 +4,5 @@ spacy
 pillow
 torchvision
 matplotlib
+scikit-image
+nltk
