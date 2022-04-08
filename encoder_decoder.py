@@ -56,7 +56,7 @@ class EncoderDecoder(nn.Module):
 
                 # Loss
                 targets = batch_captions[:, 1:]
-                
+
                 loss = loss_criterion(outputs.view(-1, self.vocab_size), targets.reshape(-1))
 
                 # Backward pass
@@ -83,15 +83,14 @@ class EncoderDecoder(nn.Module):
             features = self.encoder(features_tensors[0:1].to(DEVICE))
             captions, alphas = self.decoder.predict_caption(features, dataset.word2idx, dataset.idx2word)
 
-
             captions_ref = dataset.df[dataset.df["image"] == img_name[0]]["caption"]
-            captions_ref = [ caption.split() for caption in captions]
+            captions_ref = [caption.split() for caption in captions]
             bleu_score = sentence_bleu(captions_ref, captions)
 
-            show_image(features_tensors[0], self.normalise, title=' '.join(captions)+f"\nBLEU score: {bleu_score:.2f}")
+            show_image(features_tensors[0], self.normalise, title=' '.join(captions) + f"\nBLEU score: {bleu_score:.2f}")
 
         return captions, alphas
-    
+
     def display_attention(self, data_loader, word2idx, idx2word, features_dims):
         images, _, _ = next(iter(data_loader))
 

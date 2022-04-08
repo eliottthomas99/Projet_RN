@@ -18,7 +18,7 @@ def collate(batch, pad_idx):
     captions = pad_sequence(captions, batch_first=True, padding_value=pad_idx)
 
     img_names = [item[2] for item in batch]
-    return images, captions , img_names
+    return images, captions, img_names
 
 
 def show_image(img, normalise, title=None):
@@ -42,21 +42,21 @@ def plot_attention(img, caption, alphas, normalise=False, features_dims=7):
         for i in range(3):
             img[i] *= MAGIC_SIGMA[i]
             img[i] += MAGIC_MU[i]
-    
+
     img = img.numpy().transpose((1, 2, 0))
     img_cpy = img
 
     fig = plt.figure(figsize=(15, 15))
 
     len_caption = len(caption)
-    for l in range(len_caption):
-        att = alphas[l].reshape(features_dims, features_dims)
+    for i in range(len_caption):
+        att = alphas[i].reshape(features_dims, features_dims)
         att = pyramid_expand(att, upscale=24, sigma=8)
-        
-        ax = fig.add_subplot(len_caption // 2, len_caption // 2, l+1)
-        ax.set_title(caption[l])
+
+        ax = fig.add_subplot(len_caption // 2, len_caption // 2, i + 1)
+        ax.set_title(caption[i])
         img = ax.imshow(img_cpy)
         ax.imshow(att, cmap='gray', alpha=0.7, extent=img.get_extent())
-    
+
     plt.tight_layout()
     plt.show()
