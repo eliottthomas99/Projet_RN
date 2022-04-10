@@ -12,7 +12,7 @@ from nltk.translate.nist_score import sentence_nist
 
 
 class EncoderDecoder(nn.Module):
-    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, n_epochs, normalise=False, extractor="vgg", dropout=0.2):
+    def __init__(self, vocab_size, encoder_dim, n_epochs, embed_size=300, attention_dim=256, decoder_dim=512, normalise=False, extractor="vgg", dropout=0.2):
         super().__init__()
 
         self.embed_size = embed_size
@@ -26,6 +26,10 @@ class EncoderDecoder(nn.Module):
         self.extractor = extractor
         self.fit_date = None
 
+        self.dropout = dropout
+        self.vocab_size = vocab_size
+        self.encoder_dim = encoder_dim
+
         self.encoder = EncoderCNN(extractor)
 
         self.decoder = DecoderRNN(
@@ -33,6 +37,22 @@ class EncoderDecoder(nn.Module):
             vocab_size=vocab_size,
             attention_dim=attention_dim,
             encoder_dim=encoder_dim,
+            decoder_dim=decoder_dim,
+            dropout=dropout
+        )
+    
+    def set_params(self, extractor, learning_rate, embed_size, attention_dim, decoder_dim, dropout):
+        self.extractor = extractor
+        self.learning_rate = learning_rate
+        self.embed_size = embed_size
+        self.attention_dim = attention_dim
+        self.decoder_dim = decoder_dim
+
+        self.decoder = DecoderRNN(
+            embed_size=embed_size,
+            vocab_size=self.vocab_size,
+            attention_dim=attention_dim,
+            encoder_dim=self.encoder_dim,
             decoder_dim=decoder_dim,
             dropout=dropout
         )
@@ -58,6 +78,7 @@ class EncoderDecoder(nn.Module):
                 # Loss
                 targets = batch_captions[:, 1:]
 
+                
                 loss = loss_criterion(outputs.view(-1, self.vocab_size), targets.reshape(-1))
 
                 # Backward pass
@@ -77,6 +98,8 @@ class EncoderDecoder(nn.Module):
                     self.train()
 
             self.save(epoch)
+
+        return loss.item()
 
     def predict(self, features_tensors, dataset, img_name):
         self.eval()

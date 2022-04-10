@@ -5,25 +5,8 @@ from torch.utils.data import DataLoader
 
 from data_loader import DatasetLoader
 from encoder_decoder import EncoderDecoder
-from utils import DEVICE, collate
-
-# Constants
-PATH = "flickr8k/"
-NORMALISE = True
-MODEL_PARAMS = {
-    "vgg16": {
-        "encoder_channels": 512,
-        "features_dims": 7
-    },
-    "resnet50": {
-        "encoder_channels": 2048,
-        "features_dims": 8
-    },
-    "inception_v3": {
-        "encoder_channels": 2048,
-        "features_dims": 8
-    }
-}
+from optimum import optisearch
+from utils import DEVICE, collate, MODEL_PARAMS, PATH, NORMALISE
 
 
 # Command line arguments
@@ -35,7 +18,8 @@ MODEL_PARAMS = {
 @click.option("-dd", "--decoder_dim", default=512, help="default is 512")
 @click.option("-lr", "--learning_rate", default=1e-3, help="default is 1e-3")
 @click.option("-e", "--epochs", default=10, help="default is 10")
-def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning_rate, epochs):
+@click.option("-t", "--tuna", default=0, help="default is 0")
+def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning_rate, epochs, tuna):
     encoder_dim = MODEL_PARAMS[extractor]["encoder_channels"]
 
     # Load data
@@ -45,6 +29,7 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
     dataset.build_vocab()
 
     vocab_size = len(dataset.word2idx)
+
     pad_idx = dataset.word2idx["<PAD>"]
 
     data_loader = DataLoader(
@@ -70,12 +55,17 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
     ).to(DEVICE)
 
     # Loss and optimizer
-    ce_loss = nn.CrossEntropyLoss(ignore_index=pad_idx)
+    # loss = nn.CrossEntropyLoss(ignore_index=pad_idx)
+    loss = nn.L1Loss()
+
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-    # Train model
-    # model.load("vgg_2022_04_06_14_01.pth")
-    model.fit(data_loader, optimizer, ce_loss, dataset)
+    if tuna:
+        optisearch(model, extractor, dataset, data_loader, optimizer, loss)
+    else:
+        # Train model
+        # model.load("vgg_2022_04_06_14_01.pth")
+        model.fit(data_loader, optimizer, loss, dataset)
 
     # Display attentions
     # model.display_attention(data_loader, dataset.word2idx, dataset.idx2word, features_dims=MODEL_PARAMS["features_dims"][extractor])

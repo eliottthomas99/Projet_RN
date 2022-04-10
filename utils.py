@@ -1,13 +1,38 @@
 import matplotlib.pyplot as plt
 from skimage.transform import pyramid_expand
-from torch import cat, cuda
+from torch import cat, cuda, manual_seed, backends
 from torch import device as torch_device
 from torch.nn.utils.rnn import pad_sequence
+
+
+# Constants
+PATH = "flickr8k/"
+NORMALISE = True
+MODEL_PARAMS = {
+    "vgg16": {
+        "encoder_channels": 512,
+        "features_dims": 7
+    },
+    "resnet50": {
+        "encoder_channels": 2048,
+        "features_dims": 8
+    },
+    "inception_v3": {
+        "encoder_channels": 2048,
+        "features_dims": 8
+    }
+}
 
 MAGIC_MU = [0.485, 0.456, 0.406]
 MAGIC_SIGMA = [0.229, 0.224, 0.225]
 
-DEVICE = torch_device('cuda:0' if cuda.is_available() else "cpu")
+backends.cudnn.determinstic = True
+if cuda.is_available():
+    DEVICE = torch_device('cuda:0')
+    cuda.manual_seed_all(42)
+else:
+    DEVICE = torch_device('cpu')
+    manual_seed(42)
 
 
 def collate(batch, pad_idx):
