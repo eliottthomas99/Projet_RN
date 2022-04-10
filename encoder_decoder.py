@@ -8,6 +8,7 @@ from encoder import EncoderCNN
 from utils import DEVICE, show_image, plot_attention
 
 from nltk.translate.bleu_score import sentence_bleu
+from nltk.translate.nist_score import sentence_nist
 
 
 class EncoderDecoder(nn.Module):
@@ -84,10 +85,13 @@ class EncoderDecoder(nn.Module):
             captions, alphas = self.decoder.predict_caption(features, dataset.word2idx, dataset.idx2word)
 
             captions_ref = dataset.df[dataset.df["image"] == img_name[0]]["caption"]
-            captions_ref = [caption.split() for caption in captions]
-            bleu_score = sentence_bleu(captions_ref, captions)
+            captions_ref = [ caption.split() for caption in captions]
+            try:
+                mt_score = sentence_nist(captions_ref, captions)
+            except:
+                mt_score = sentence_bleu(captions_ref, captions)
 
-            show_image(features_tensors[0], self.normalise, title=' '.join(captions) + f"\nBLEU score: {bleu_score:.2f}")
+            show_image(features_tensors[0], self.normalise, title=' '.join(captions)+f"\nMT score: {mt_score:.2f}")
 
         return captions, alphas
 
