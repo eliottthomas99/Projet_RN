@@ -83,9 +83,10 @@ class EncoderDecoder(nn.Module):
         with torch.no_grad():
             features = self.encoder(features_tensors[0:1].to(DEVICE))
             captions, alphas = self.decoder.predict_caption(features, dataset.word2idx, dataset.idx2word)
+            captions = captions[:-1]
 
             captions_ref = dataset.df[dataset.df["image"] == img_name[0]]["caption"]
-            captions_ref = [ caption.split() for caption in captions]
+            captions_ref = [ caption.split() for caption in captions_ref]
             try:
                 mt_score = sentence_nist(captions_ref, captions)
             except:
