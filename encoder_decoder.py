@@ -139,7 +139,7 @@ class EncoderDecoder(nn.Module):
 
         return captions, alphas
 
-    def display_attention(self, data_loader, word2idx, idx2word, features_dims):
+    def display_attention(self, data_loader, dataset, features_dims):
         """
         Display attention regions on images.
         
@@ -151,7 +151,7 @@ class EncoderDecoder(nn.Module):
         images, _, _ = next(iter(data_loader))
 
         img = images[0].detach().clone()
-        captions, alphas = self.predict(img.unsqueeze(0), word2idx, idx2word)
+        captions, alphas = self.predict(img.unsqueeze(0), dataset)
 
         img = images[0].detach().clone()
         plot_attention(img, captions, alphas, self.normalise, features_dims)

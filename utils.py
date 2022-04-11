@@ -11,7 +11,7 @@ NORMALISE = True
 MODEL_PARAMS = {
     "vgg16": {
         "encoder_channels": 512,
-        "features_dims": 7
+        "features_dims": 9
     },
     "resnet50": {
         "encoder_channels": 2048,

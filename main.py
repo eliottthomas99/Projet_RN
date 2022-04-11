@@ -113,9 +113,9 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
             print("Predicting:", img_path, "after training")
             _ = model.predict(img, dataset)
  
-
-    # Display attentions
-    # model.display_attention(data_loader, dataset.word2idx, dataset.idx2word, features_dims=MODEL_PARAMS["features_dims"][extractor])
+        # Display attentions
+        if disp_attention:
+            model.display_attention(data_loader, dataset, features_dims=MODEL_PARAMS[extractor]["features_dims"])
 
 
 if __name__ == "__main__":
