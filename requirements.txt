@@ -6,3 +6,4 @@ torchvision
 matplotlib
 scikit-image
 nltk
+optuna
