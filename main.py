@@ -25,6 +25,22 @@ from PIL import Image
 @click.option("-ld", "--load", default=None, help="path to the model to load")
 @click.option("-ip", "--img_path", default=None, help="path to the image to predict")
 def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning_rate, dropout, nb_img, epochs, tuna, load, img_path):
+    """
+    Main function.
+    
+    :param extractor: extractor to use
+    :param batch_size: batch size
+    :param embed_size: embedding size
+    :param attention_dim: attention dimension
+    :param decoder_dim: decoder dimension
+    :param learning_rate: learning rate
+    :param dropout: dropout
+    :param nb_img: number of images to use
+    :param epochs: number of epochs
+    :param tuna: if 1, use the tuner to fine tune hyperparameters
+    :param load: path to the model to load (optional)
+    :param img_path: path to the image to predict
+    """
     encoder_dim = MODEL_PARAMS[extractor]["encoder_channels"]
 
     # Load data
@@ -64,8 +80,8 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
     ).to(DEVICE)
 
     # Loss and optimizer
-    loss = nn.CrossEntropyLoss(ignore_index=pad_idx)
-    # loss = nn.L1Loss()
+    #loss = nn.CrossEntropyLoss(ignore_index=pad_idx)
+    loss = nn.NLLLoss(ignore_index=pad_idx)
 
 
     if tuna:
@@ -97,9 +113,7 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
         if img_path is not None:
             print("Predicting:", img_path, "after training")
             _ = model.predict(img, dataset)
-
-            
-        
+ 
 
     # Display attentions
     # model.display_attention(data_loader, dataset.word2idx, dataset.idx2word, features_dims=MODEL_PARAMS["features_dims"][extractor])

@@ -23,9 +23,11 @@ MODEL_PARAMS = {
     }
 }
 
+# Expectation and Standard Deviation over ImageNet
 MAGIC_MU = [0.485, 0.456, 0.406]
 MAGIC_SIGMA = [0.229, 0.224, 0.225]
 
+# Set the seed for reproducibility
 backends.cudnn.determinstic = True
 if cuda.is_available():
     DEVICE = torch_device('cuda:0')
@@ -36,6 +38,12 @@ else:
 
 
 def collate(batch, pad_idx):
+    """
+    Form batches of data.
+
+    :param batch: list of tuples (image, caption, image_name)
+    :param pad_idx: index of padding token
+    """
     images = [item[0].unsqueeze(0) for item in batch]
     images = cat(images, dim=0)
 
@@ -47,7 +55,16 @@ def collate(batch, pad_idx):
 
 
 def show_image(img, normalise, title=None):
-    img2 = np.copy(img)
+    """
+    Unormalise and show image.
+
+    :param img: image
+    :param normalise: whether to Un-normalise or not
+    :param title: title of the image
+    """
+
+    img2 = np.copy(img) # copy the image to avoid changing the original one and let the possibility of multiple predictions
+    
     # Unnormalise
     if normalise:
         for i in range(3):
@@ -63,6 +80,16 @@ def show_image(img, normalise, title=None):
     #plt.show()
 
 def plot_attention(img, caption, alphas, normalise=False, features_dims=7):
+    """
+    Plot the attention weights.
+
+    :param img: image
+    :param caption: caption
+    :param alphas: attention weights
+    :param normalise: whether to Un-normalise or not
+    :param features_dims: number of features dimensions
+
+    """
     # Unnormalise
     if normalise:
         for i in range(3):

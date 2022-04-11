@@ -11,6 +11,9 @@ from utils import MAGIC_MU, MAGIC_SIGMA
 
 
 class DatasetLoader(Dataset):
+    """
+    DataLoader.
+    """
 
     def __init__(self, img_path, captions_file, normalise=False, img_size=299, nb_img=None):
         self.img_path = img_path
@@ -38,6 +41,10 @@ class DatasetLoader(Dataset):
         return self.df.shape[0]
 
     def __getitem__(self, idx):
+        """
+        Get item.
+        """
+
         caption = self.captions[idx]
         img_name = self.imgs[idx]
 
@@ -59,6 +66,10 @@ class DatasetLoader(Dataset):
         return img, caption , img_name
 
     def build_vocab(self):
+        """
+        Build vocabulary.
+        """
+
         curr_idx = len(self.word2idx)
         freq_threshold = 2
         frequencies = dict()
@@ -78,5 +89,10 @@ class DatasetLoader(Dataset):
                     curr_idx += 1
 
     def tokenise(self, sentence):
+        """
+        Tokenise sentence.
+
+        :param sentence: sentence to tokenise
+        """
         tokens = [str(token).lower() for token in self.spacy_en.tokenizer(sentence)]
         return [self.word2idx[tok] if tok in self.word2idx else self.word2idx["<UNK>"] for tok in tokens]

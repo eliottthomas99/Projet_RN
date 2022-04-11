@@ -2,7 +2,13 @@ import torch.nn as nn
 import torchvision.models as models
 
 class EncoderCNN(nn.Module):
+    """
+    EncoderCNN
+    """
     def __init__(self, model="vgg16"):
+        """
+        :param model: name of pre-trained CNN to use
+        """
         super(EncoderCNN, self).__init__()
 
         if model == "vgg16":
@@ -19,6 +25,12 @@ class EncoderCNN(nn.Module):
             param.requires_grad_(False)
 
     def forward(self, images):
+        """
+        Forward propagation.
+
+        :param images: images, a tensor of size (batch_size, 3, image_size, image_size)
+        :return: encoded images
+        """
         features = self.cnn(images)                                         # (batch, channels, h, w)
         features = features.permute(0, 2, 3, 1)                             # (batch, h, w, channels)
         features = features.view(features.size(0), -1, features.size(-1))   # (batch, h * w, channels)

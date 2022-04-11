@@ -101,12 +101,12 @@ class EncoderDecoder(nn.Module):
                 captions_ref = [ caption.split() for caption in captions_ref]
                 
                 try:
-                    print("nist nist nist")
+                    print("NIST")
                     print(captions_ref)
                     print(captions)
                     mt_score = sentence_nist(captions_ref, captions)
                 except:
-                    print("bleu bleu bleu")
+                    print("BLEU")
                     print(captions_ref)
                     print(captions)
                     mt_score = sentence_bleu(captions_ref, captions)
