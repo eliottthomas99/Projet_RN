@@ -24,7 +24,8 @@ from PIL import Image
 @click.option("-t", "--tuna", default=0, help="default is 0")
 @click.option("-ld", "--load", default=None, help="path to the model to load")
 @click.option("-ip", "--img_path", default=None, help="path to the image to predict")
-def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning_rate, dropout, nb_img, epochs, tuna, load, img_path):
+@click.option("-att", "--disp_attention", default=0, help="default is 0")
+def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning_rate, dropout, nb_img, epochs, tuna, load, img_path, disp_attention):
     """
     Main function.
     
@@ -40,6 +41,7 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
     :param tuna: if 1, use the tuner to fine tune hyperparameters
     :param load: path to the model to load (optional)
     :param img_path: path to the image to predict
+    :param disp_attention: if 1, display attention weights
     """
     encoder_dim = MODEL_PARAMS[extractor]["encoder_channels"]
 
