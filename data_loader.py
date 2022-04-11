@@ -11,10 +11,17 @@ from utils import MAGIC_MU, MAGIC_SIGMA
 
 
 class DatasetLoader(Dataset):
+    """
+    DataLoader.
+    """
 
-    def __init__(self, img_path, captions_file, normalise=False):
+    def __init__(self, img_path, captions_file, normalise=False, img_size=299, nb_img=None):
         self.img_path = img_path
+        if nb_img is not None:
+            nb_img = int(nb_img)*5
+
         self.df = pd.read_csv(captions_file)
+        self.df = self.df[:nb_img]
 
         self.normalise = normalise
 
@@ -26,7 +33,7 @@ class DatasetLoader(Dataset):
         self.idx2word = {i: w for w, i in self.word2idx.items()}
 
         self.transform = transforms.Compose([
-            transforms.Resize((250, 250)),
+            transforms.Resize((img_size, img_size)),
             transforms.ToTensor()  # scale image to [0,1]
         ])
 
@@ -34,6 +41,10 @@ class DatasetLoader(Dataset):
         return self.df.shape[0]
 
     def __getitem__(self, idx):
+        """
+        Get item.
+        """
+
         caption = self.captions[idx]
         img_name = self.imgs[idx]
 
@@ -51,9 +62,14 @@ class DatasetLoader(Dataset):
                          self.tokenise(caption) +
                          [self.word2idx["<END>"]])
 
-        return img, caption
+        
+        return img, caption , img_name
 
     def build_vocab(self):
+        """
+        Build vocabulary.
+        """
+
         curr_idx = len(self.word2idx)
         freq_threshold = 2
         frequencies = dict()
@@ -73,5 +89,10 @@ class DatasetLoader(Dataset):
                     curr_idx += 1
 
     def tokenise(self, sentence):
+        """
+        Tokenise sentence.
+
+        :param sentence: sentence to tokenise
+        """
         tokens = [str(token).lower() for token in self.spacy_en.tokenizer(sentence)]
         return [self.word2idx[tok] if tok in self.word2idx else self.word2idx["<UNK>"] for tok in tokens]
