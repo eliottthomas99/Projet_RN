@@ -41,21 +41,23 @@ class EncoderDecoder(nn.Module):
             dropout=dropout
         )
     
-    def set_params(self, extractor, learning_rate, embed_size, attention_dim, decoder_dim, dropout):
-        self.extractor = extractor
-        self.learning_rate = learning_rate
-        self.embed_size = embed_size
-        self.attention_dim = attention_dim
-        self.decoder_dim = decoder_dim
+    # def set_params(self, extractor, learning_rate, embed_size, attention_dim, decoder_dim, dropout):
+    #     self.extractor = extractor
+    #     self.learning_rate = learning_rate
+    #     self.embed_size = embed_size
+    #     self.attention_dim = attention_dim
+    #     self.decoder_dim = decoder_dim
+    #     # self.decoder.dropout = nn.Dropout(dropout)
 
-        self.decoder = DecoderRNN(
-            embed_size=embed_size,
-            vocab_size=self.vocab_size,
-            attention_dim=attention_dim,
-            encoder_dim=self.encoder_dim,
-            decoder_dim=decoder_dim,
-            dropout=dropout
-        )
+    #     self.decoder = DecoderRNN(
+    #         embed_size=embed_size,
+    #         vocab_size=self.vocab_size,
+    #         attention_dim=attention_dim,
+    #         encoder_dim=self.encoder_dim,
+    #         decoder_dim=decoder_dim,
+    #         dropout=dropout
+    #     )
+
 
     def forward(self, images, captions):
         features = self.encoder(images)
@@ -111,8 +113,14 @@ class EncoderDecoder(nn.Module):
             captions_ref = dataset.df[dataset.df["image"] == img_name[0]]["caption"]
             captions_ref = [ caption.split() for caption in captions_ref]
             try:
+                print("nist nist nist")
+                print(captions_ref)
+                print(captions)
                 mt_score = sentence_nist(captions_ref, captions)
             except:
+                print("bleu bleu bleu")
+                print(captions_ref)
+                print(captions)
                 mt_score = sentence_bleu(captions_ref, captions)
 
             show_image(features_tensors[0], self.normalise, title=' '.join(captions)+f"\nMT score: {mt_score:.2f}")

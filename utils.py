@@ -58,8 +58,8 @@ def show_image(img, normalise, title=None):
     if title is not None:
         plt.title(title)
     plt.imshow(img)
-    plt.pause(1e-3)
-
+    #plt.pause(1e-3)
+    #plt.show()
 
 def plot_attention(img, caption, alphas, normalise=False, features_dims=7):
     # Unnormalise
