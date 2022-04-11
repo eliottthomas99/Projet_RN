@@ -80,8 +80,7 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
     ).to(DEVICE)
 
     # Loss and optimizer
-    #loss = nn.CrossEntropyLoss(ignore_index=pad_idx)
-    loss = nn.NLLLoss(ignore_index=pad_idx)
+    loss = nn.CrossEntropyLoss(ignore_index=pad_idx)
 
 
     if tuna:
@@ -120,4 +119,5 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
 
 
 if __name__ == "__main__":
-    main()
+    main() # for command line usage
+    

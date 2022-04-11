@@ -121,21 +121,20 @@ class EncoderDecoder(nn.Module):
 
                 captions_ref = dataset.df[dataset.df["image"] == img_name[0]]["caption"]
                 captions_ref = [ caption.split() for caption in captions_ref]
-                
+
+                # display captions
+                print("captions references :", captions_ref)
+
                 try:
                     print("NIST")
-                    print(captions_ref)
-                    print(captions)
                     mt_score = sentence_nist(captions_ref, captions)
                 except:
                     print("BLEU")
-                    print(captions_ref)
-                    print(captions)
                     mt_score = sentence_bleu(captions_ref, captions)
 
                 mt = f"\nMT score: {mt_score:.2f}"
             # print captions 
-            print(captions)
+            print("predicted caption :" , captions)
             show_image(features_tensors[0], self.normalise, title=' '.join(captions)+mt)
 
         return captions, alphas

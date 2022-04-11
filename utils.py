@@ -77,7 +77,7 @@ def show_image(img, normalise, title=None):
         plt.title(title)
     plt.imshow(img2)
     #plt.pause(1e-3)
-    #plt.show()
+    plt.show()
 
 def plot_attention(img, caption, alphas, normalise=False, features_dims=7):
     """
