@@ -93,16 +93,13 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
 
         if load is not None:
             model.load(load)
+            model.to(DEVICE)
 
         if img_path is not None:
             print("Predicting:", img_path, "before training")
             # Image preprocessing
             img = Image.open(img_path)
             img = dataset.transform(img)
-
-            for c in range(3):
-                img[c] -= MAGIC_MU[c]
-                img[c] /= MAGIC_SIGMA[c]
 
             img = img.unsqueeze(0)
             _ = model.predict(img, dataset)
