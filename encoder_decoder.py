@@ -2,17 +2,28 @@ from datetime import datetime
 
 import torch
 import torch.nn as nn
-
-from decoder import DecoderRNN
-from encoder import EncoderCNN
-from utils import DEVICE, show_image, plot_attention
-
 from nltk.translate.bleu_score import sentence_bleu
 from nltk.translate.nist_score import sentence_nist
 
+from decoder import DecoderRNN
+from encoder import EncoderCNN
+from utils import DEVICE, plot_attention, show_image
+
 
 class EncoderDecoder(nn.Module):
-    def __init__(self, vocab_size, encoder_dim, n_epochs, embed_size=300, attention_dim=256, decoder_dim=512, normalise=False, extractor="vgg", dropout=0.2):
+    def __init__(
+            self,
+            vocab_size,
+            encoder_dim,
+            embed_size=300,
+            attention_dim=256,
+            decoder_dim=512,
+            normalise=False,
+            extractor="vgg16",
+            n_epochs=10,
+            dropout=0.2
+    ):
+
         super().__init__()
 
         self.embed_size = embed_size

@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
-from skimage.transform import pyramid_expand
-from torch import cat, cuda, manual_seed, backends
-from torch import device as torch_device
-from torch.nn.utils.rnn import pad_sequence
 import numpy as np
+from skimage.transform import pyramid_expand
+from torch import backends, cat, cuda
+from torch import device as torch_device
+from torch import manual_seed
+from torch.nn.utils.rnn import pad_sequence
 
 # Constants
 PATH = "flickr8k/"
@@ -63,8 +64,8 @@ def show_image(img, normalise, title=None):
     :param title: title of the image
     """
 
-    img2 = np.copy(img) # copy the image to avoid changing the original one and let the possibility of multiple predictions
-    
+    img2 = np.copy(img)  # copy image to prevent changing the original one
+
     # Unnormalise
     if normalise:
         for i in range(3):
@@ -76,8 +77,7 @@ def show_image(img, normalise, title=None):
     if title is not None:
         plt.title(title)
     plt.imshow(img2)
-    #plt.pause(1e-3)
-    plt.show()
+
 
 def plot_attention(img, caption, alphas, normalise=False):
     """
@@ -88,7 +88,6 @@ def plot_attention(img, caption, alphas, normalise=False):
     :param alphas: attention weights
     :param normalise: whether to Un-normalise or not
     :param features_dims: number of features dimensions
-
     """
     # Unnormalise
     if normalise:
@@ -103,7 +102,7 @@ def plot_attention(img, caption, alphas, normalise=False):
 
     len_caption = len(caption)
     features_dims = np.sqrt(alphas[0].shape[1]).astype(int)
-    
+
     for i in range(len_caption):
         att = alphas[i].reshape(features_dims, features_dims)
         att = pyramid_expand(att, upscale=24, sigma=8)

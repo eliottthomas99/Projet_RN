@@ -33,10 +33,10 @@ class Attention(nn.Module):
             self.W1(features) + self.W2(hidden_state).unsqueeze(1)
         )   # (batch, layers, attemtion_dim)
 
-        scores = self.V(scores)     # (batch, layers, 1)
-        scores = scores.squeeze(2)  # (batch, layers)
+        scores = self.V(scores)                  # (batch, layers, 1)
+        scores = scores.squeeze(2)               # (batch, layers)
 
-        alpha = F.softmax(scores, dim=1)  # (batch, layers)
+        alpha = F.softmax(scores, dim=1)         # (batch, layers)
 
         context = features * alpha.unsqueeze(2)  # (batch, layers, features_dim)
         context = context.sum(dim=1)             # (batch, layers)
@@ -48,7 +48,7 @@ class DecoderRNN(nn.Module):
     """
     Decoder
     """
-    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, dropout=0.2):
+    def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, dropout):
         """
         :param embed_size: dimension of word embeddings
         :param vocab_size: size of the vocabulary
@@ -84,6 +84,7 @@ class DecoderRNN(nn.Module):
         mean_encoder_out = encoder_out.mean(dim=1)
         h = self.init_h(mean_encoder_out)
         c = self.init_c(mean_encoder_out)
+
         return h, c
 
     def forward(self, features, captions):

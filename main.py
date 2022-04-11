@@ -1,13 +1,13 @@
 import click
 import torch.nn as nn
-import torch.optim as optim
+from PIL import Image
+from torch import optim
 from torch.utils.data import DataLoader
 
 from data_loader import DatasetLoader
 from encoder_decoder import EncoderDecoder
 from optisearch import optisearch
 from utils import DEVICE, MODEL_PARAMS, NORMALISE, PATH, collate
-from PIL import Image
 
 
 # Command line arguments
