@@ -1,11 +1,13 @@
 import click
 import torch.nn as nn
+import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from data_loader import DatasetLoader
 from encoder_decoder import EncoderDecoder
 from optisearch import optisearch
-from utils import DEVICE, collate, MODEL_PARAMS, PATH, NORMALISE
+from utils import DEVICE, MODEL_PARAMS, NORMALISE, PATH, collate, MAGIC_MU, MAGIC_SIGMA
+from PIL import Image
 
 
 # Command line arguments
@@ -20,7 +22,9 @@ from utils import DEVICE, collate, MODEL_PARAMS, PATH, NORMALISE
 @click.option("-nb", "--nb_img", default=None, help="default is None --> all images")
 @click.option("-e", "--epochs", default=10, help="default is 10")
 @click.option("-t", "--tuna", default=0, help="default is 0")
-def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning_rate, dropout, nb_img, epochs, tuna):
+@click.option("-ld", "--load", default=None, help="path to the model to load")
+@click.option("-ip", "--img_path", default=None, help="path to the image to predict")
+def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning_rate, dropout, nb_img, epochs, tuna, load, img_path):
     encoder_dim = MODEL_PARAMS[extractor]["encoder_channels"]
 
     # Load data
@@ -67,10 +71,35 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
     if tuna:
         optisearch(extractor, dataset, data_loader, loss, vocab_size, encoder_dim, epochs, NORMALISE)
     else:
+        
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+        if load is not None:
+            model.load(load)
+
+        if img_path is not None:
+            print("Predicting:", img_path, "before training")
+            # Image preprocessing
+            img = Image.open(img_path)
+            img = dataset.transform(img)
+
+            for c in range(3):
+                img[c] -= MAGIC_MU[c]
+                img[c] /= MAGIC_SIGMA[c]
+
+            img = img.unsqueeze(0)
+            _ = model.predict(img, dataset)
+
+
         # Train model
-        # model.load("vgg_2022_04_06_14_01.pth")
         model.fit(data_loader, optimizer, loss, dataset)
+
+        if img_path is not None:
+            print("Predicting:", img_path, "after training")
+            _ = model.predict(img, dataset)
+
+            
+        
 
     # Display attentions
     # model.display_attention(data_loader, dataset.word2idx, dataset.idx2word, features_dims=MODEL_PARAMS["features_dims"][extractor])

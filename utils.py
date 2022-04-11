@@ -3,7 +3,7 @@ from skimage.transform import pyramid_expand
 from torch import cat, cuda, manual_seed, backends
 from torch import device as torch_device
 from torch.nn.utils.rnn import pad_sequence
-
+import numpy as np
 
 # Constants
 PATH = "flickr8k/"
@@ -47,17 +47,18 @@ def collate(batch, pad_idx):
 
 
 def show_image(img, normalise, title=None):
+    img2 = np.copy(img)
     # Unnormalise
     if normalise:
         for i in range(3):
-            img[i] *= MAGIC_SIGMA[i]
-            img[i] += MAGIC_MU[i]
+            img2[i] *= MAGIC_SIGMA[i]
+            img2[i] += MAGIC_MU[i]
 
-    img = img.numpy().transpose((1, 2, 0))
+    img2 = img2.transpose((1, 2, 0))
 
     if title is not None:
         plt.title(title)
-    plt.imshow(img)
+    plt.imshow(img2)
     #plt.pause(1e-3)
     #plt.show()
 

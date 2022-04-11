@@ -40,23 +40,6 @@ class EncoderDecoder(nn.Module):
             decoder_dim=decoder_dim,
             dropout=dropout
         )
-    
-    # def set_params(self, extractor, learning_rate, embed_size, attention_dim, decoder_dim, dropout):
-    #     self.extractor = extractor
-    #     self.learning_rate = learning_rate
-    #     self.embed_size = embed_size
-    #     self.attention_dim = attention_dim
-    #     self.decoder_dim = decoder_dim
-    #     # self.decoder.dropout = nn.Dropout(dropout)
-
-    #     self.decoder = DecoderRNN(
-    #         embed_size=embed_size,
-    #         vocab_size=self.vocab_size,
-    #         attention_dim=attention_dim,
-    #         encoder_dim=self.encoder_dim,
-    #         decoder_dim=decoder_dim,
-    #         dropout=dropout
-    #     )
 
 
     def forward(self, images, captions):
@@ -66,6 +49,7 @@ class EncoderDecoder(nn.Module):
         return outputs
 
     def fit(self, data_loader, optimizer, loss_criterion, dataset):
+        loss = None
         self.fit_date = datetime.now().strftime("%Y_%m_%d_%H_%M")
         for epoch in range(self.curr_epoch, self.n_epochs + 1):
             for idx, (batch_images, batch_captions, _) in enumerate(iter(data_loader)):
@@ -101,29 +85,36 @@ class EncoderDecoder(nn.Module):
 
             self.save(epoch)
 
-        return loss.item()
+        if loss is not None :
+            return loss.item()
 
-    def predict(self, features_tensors, dataset, img_name):
+    def predict(self, features_tensors, dataset, img_name=None):
         self.eval()
         with torch.no_grad():
             features = self.encoder(features_tensors[0:1].to(DEVICE))
             captions, alphas = self.decoder.predict_caption(features, dataset.word2idx, dataset.idx2word)
             captions = captions[:-1]
+            mt = ""
+            if img_name is not None:
 
-            captions_ref = dataset.df[dataset.df["image"] == img_name[0]]["caption"]
-            captions_ref = [ caption.split() for caption in captions_ref]
-            try:
-                print("nist nist nist")
-                print(captions_ref)
-                print(captions)
-                mt_score = sentence_nist(captions_ref, captions)
-            except:
-                print("bleu bleu bleu")
-                print(captions_ref)
-                print(captions)
-                mt_score = sentence_bleu(captions_ref, captions)
+                captions_ref = dataset.df[dataset.df["image"] == img_name[0]]["caption"]
+                captions_ref = [ caption.split() for caption in captions_ref]
+                
+                try:
+                    print("nist nist nist")
+                    print(captions_ref)
+                    print(captions)
+                    mt_score = sentence_nist(captions_ref, captions)
+                except:
+                    print("bleu bleu bleu")
+                    print(captions_ref)
+                    print(captions)
+                    mt_score = sentence_bleu(captions_ref, captions)
 
-            show_image(features_tensors[0], self.normalise, title=' '.join(captions)+f"\nMT score: {mt_score:.2f}")
+                mt = f"\nMT score: {mt_score:.2f}"
+            # print captions 
+            print(captions)
+            show_image(features_tensors[0], self.normalise, title=' '.join(captions)+mt)
 
         return captions, alphas
 
@@ -151,6 +142,22 @@ class EncoderDecoder(nn.Module):
         torch.save(model_state, save_name)
 
     def load(self, saved_path):
-        model_dict = torch.load(saved_path)
-        self.load_state_dict(model_dict["state_dict"])
+        model_dict = torch.load(saved_path, map_location=torch.device(DEVICE))
         self.curr_epoch = model_dict["num_epochs"] + 1
+        self.embed_size = model_dict["embed_size"]
+        self.vocab_size = model_dict["vocab_size"]
+        self.attention_dim = model_dict["attention_dim"]
+        self.encoder_dim = model_dict["encoder_dim"]
+        self.decoder_dim = model_dict["decoder_dim"]
+
+        self.decoder = DecoderRNN(
+            embed_size=self.embed_size,
+            vocab_size=self.vocab_size,
+            attention_dim=self.attention_dim,
+            encoder_dim=self.encoder_dim,
+            decoder_dim=self.decoder_dim,
+            dropout=self.dropout
+        )
+
+        self.load_state_dict(model_dict["state_dict"])
+
