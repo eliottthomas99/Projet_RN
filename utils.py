@@ -15,11 +15,11 @@ MODEL_PARAMS = {
     },
     "resnet50": {
         "encoder_channels": 2048,
-        "features_dims": 8
+        "features_dims": 10
     },
     "inception_v3": {
         "encoder_channels": 2048,
-        "features_dims": 8
+        "features_dims": 10
     }
 }
 
@@ -79,7 +79,7 @@ def show_image(img, normalise, title=None):
     #plt.pause(1e-3)
     plt.show()
 
-def plot_attention(img, caption, alphas, normalise=False, features_dims=7):
+def plot_attention(img, caption, alphas, normalise=False):
     """
     Plot the attention weights.
 
@@ -102,6 +102,8 @@ def plot_attention(img, caption, alphas, normalise=False, features_dims=7):
     fig = plt.figure(figsize=(15, 15))
 
     len_caption = len(caption)
+    features_dims = np.sqrt(alphas[0].shape[1]).astype(int)
+    
     for i in range(len_caption):
         att = alphas[i].reshape(features_dims, features_dims)
         att = pyramid_expand(att, upscale=24, sigma=8)

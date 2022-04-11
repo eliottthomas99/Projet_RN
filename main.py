@@ -114,7 +114,7 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
  
         # Display attentions
         if disp_attention:
-            model.display_attention(data_loader, dataset, features_dims=MODEL_PARAMS[extractor]["features_dims"])
+            model.display_attention(data_loader, dataset)
 
 
 if __name__ == "__main__":
