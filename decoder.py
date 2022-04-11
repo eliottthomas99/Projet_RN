@@ -17,10 +17,10 @@ class Attention(nn.Module):
         """
         super().__init__()
 
-        self.W1 = nn.Linear(encoder_dim, attention_dim) # (batch, layers, attention_dim)
-        self.W2 = nn.Linear(decoder_dim, attention_dim) # (batch, attention_dim)
+        self.W1 = nn.Linear(encoder_dim, attention_dim)  # (batch, layers, attention_dim)
+        self.W2 = nn.Linear(decoder_dim, attention_dim)  # (batch, attention_dim)
 
-        self.V = nn.Linear(attention_dim, 1) # (batch, layers, 1)
+        self.V = nn.Linear(attention_dim, 1)             # (batch, layers, 1)
 
     def forward(self, features, hidden_state):
         """
@@ -46,7 +46,7 @@ class Attention(nn.Module):
 
 class DecoderRNN(nn.Module):
     """
-    Decoder 
+    Decoder
     """
     def __init__(self, embed_size, vocab_size, attention_dim, encoder_dim, decoder_dim, dropout=0.2):
         """

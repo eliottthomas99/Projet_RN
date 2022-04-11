@@ -18,7 +18,7 @@ class DatasetLoader(Dataset):
     def __init__(self, img_path, captions_file, normalise=False, img_size=299, nb_img=None):
         self.img_path = img_path
         if nb_img is not None:
-            nb_img = int(nb_img)*5
+            nb_img = int(nb_img) * 5
 
         self.df = pd.read_csv(captions_file)
         self.df = self.df[:nb_img]
@@ -62,8 +62,7 @@ class DatasetLoader(Dataset):
                          self.tokenise(caption) +
                          [self.word2idx["<END>"]])
 
-        
-        return img, caption , img_name
+        return img, caption, img_name
 
     def build_vocab(self):
         """

@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 from data_loader import DatasetLoader
 from encoder_decoder import EncoderDecoder
 from optisearch import optisearch
-from utils import DEVICE, MODEL_PARAMS, NORMALISE, PATH, collate, MAGIC_MU, MAGIC_SIGMA
+from utils import DEVICE, MODEL_PARAMS, NORMALISE, PATH, collate
 from PIL import Image
 
 
@@ -28,7 +28,7 @@ from PIL import Image
 def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning_rate, dropout, nb_img, epochs, tuna, load, img_path, disp_attention):
     """
     Main function.
-    
+
     :param extractor: extractor to use
     :param batch_size: batch size
     :param embed_size: embedding size
@@ -84,11 +84,10 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
     # Loss and optimizer
     loss = nn.CrossEntropyLoss(ignore_index=pad_idx)
 
-
     if tuna:
         optisearch(extractor, dataset, data_loader, loss, vocab_size, encoder_dim, epochs, NORMALISE)
     else:
-        
+
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
         if load is not None:
@@ -104,19 +103,17 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
             img = img.unsqueeze(0)
             _ = model.predict(img, dataset)
 
-
         # Train model
         model.fit(data_loader, optimizer, loss, dataset)
 
         if img_path is not None:
             print("Predicting:", img_path, "after training")
             _ = model.predict(img, dataset)
- 
+
         # Display attentions
         if disp_attention:
             model.display_attention(data_loader, dataset)
 
 
 if __name__ == "__main__":
-    main() # for command line usage
-    
+    main()  # for command line usage

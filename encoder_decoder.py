@@ -41,11 +41,10 @@ class EncoderDecoder(nn.Module):
             dropout=dropout
         )
 
-
     def forward(self, images, captions):
         """
         Forward propagation.
-        
+
         :param images: images, a tensor of dimensions (batch_size, 3, image_size, image_size)
         :param captions: captions, a tensor of dimensions (batch_size, vocab_size)
         :return: encoded images
@@ -58,7 +57,7 @@ class EncoderDecoder(nn.Module):
     def fit(self, data_loader, optimizer, loss_criterion, dataset):
         """
         Model training.
-        
+
         :param dataset_loader: DataLoader for training
         :param optimizer: optimizer to update model's weights (Adam or other)
         :param loss_criterion: loss to use (cross entropy or other)
@@ -78,8 +77,6 @@ class EncoderDecoder(nn.Module):
 
                 # Loss
                 targets = batch_captions[:, 1:]
-
-                
                 loss = loss_criterion(outputs.view(-1, self.vocab_size), targets.reshape(-1))
 
                 # Backward pass
@@ -100,13 +97,13 @@ class EncoderDecoder(nn.Module):
 
             self.save(epoch)
 
-        if loss is not None :
+        if loss is not None:
             return loss.item()
 
     def predict(self, features_tensors, dataset, img_name=None):
         """
         Get predicted caption and display image with MT score.
-        
+
         :param features_tensors: batch of images
         :param dataset: object containing dataset information
         :param img_name: name of the first image of the batch into the dataset (optional)
@@ -120,7 +117,7 @@ class EncoderDecoder(nn.Module):
             if img_name is not None:
 
                 captions_ref = dataset.df[dataset.df["image"] == img_name[0]]["caption"]
-                captions_ref = [ caption.split() for caption in captions_ref]
+                captions_ref = [caption.split() for caption in captions_ref]
 
                 # display captions
                 print("captions references :", captions_ref)
@@ -128,21 +125,21 @@ class EncoderDecoder(nn.Module):
                 try:
                     print("NIST")
                     mt_score = sentence_nist(captions_ref, captions)
-                except:
+                except ZeroDivisionError:
                     print("BLEU")
                     mt_score = sentence_bleu(captions_ref, captions)
 
                 mt = f"\nMT score: {mt_score:.2f}"
-            # print captions 
-            print("predicted caption :" , captions)
-            show_image(features_tensors[0], self.normalise, title=' '.join(captions)+mt)
+            # print captions
+            print("predicted caption :", captions)
+            show_image(features_tensors[0], self.normalise, title=' '.join(captions) + mt)
 
         return captions, alphas
 
     def display_attention(self, data_loader, dataset):
         """
         Display attention regions on images.
-        
+
         :param data_loader: DataLoader from which images are taken
         :param word2idx: dictionary mapping words with unique indexes
         :param idx2word: dictionary mapping unique indexes with words
@@ -159,7 +156,7 @@ class EncoderDecoder(nn.Module):
     def save(self, num_epochs):
         """
         Save model checkpoint.
-        
+
         :param num_epochs: number of epochs done until checkpoint
         """
         model_state = {
@@ -178,7 +175,7 @@ class EncoderDecoder(nn.Module):
     def load(self, saved_path):
         """
         Load model checkpoint.
-        
+
         :param saved_path: path of the checkpoint to load
         """
         model_dict = torch.load(saved_path, map_location=torch.device(DEVICE))
@@ -199,4 +196,3 @@ class EncoderDecoder(nn.Module):
         )
 
         self.load_state_dict(model_dict["state_dict"])
-

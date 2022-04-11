@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torchvision.models as models
 
+
 class EncoderCNN(nn.Module):
     """
     EncoderCNN
@@ -18,7 +19,7 @@ class EncoderCNN(nn.Module):
             layers = models.resnet50(pretrained=True).children()
             self.cnn = nn.Sequential(*list(layers)[:-2])
         elif model == "inception_v3":
-            layers =  models.inception_v3(pretrained=True, aux_logits=False).children()
+            layers = models.inception_v3(pretrained=True, aux_logits=False).children()
             self.cnn = nn.Sequential(*list(layers)[:-3])
 
         for param in self.cnn.parameters():
