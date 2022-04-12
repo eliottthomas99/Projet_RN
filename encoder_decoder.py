@@ -33,13 +33,13 @@ class EncoderDecoder(nn.Module):
         self.attention_dim = attention_dim
         self.embed_size = embed_size
         self.decoder_dim = decoder_dim
-
+        
         self.n_epochs = n_epochs
         self.curr_epoch = 1
         self.normalise = normalise
         self.dropout = dropout
         self.vocab_size = vocab_size
-
+        
         self.fit_date = None
         self.loss_history = list()
 
@@ -113,7 +113,7 @@ class EncoderDecoder(nn.Module):
 
         if loss is not None:
             return loss.item()
-
+    
     def test(self, data_loader, loss_criterion):
         """
         Get mean loss of test dataset.
@@ -150,7 +150,7 @@ class EncoderDecoder(nn.Module):
             captions, alphas = self.decoder.predict_caption(features, dataset.word2idx, dataset.idx2word)
             captions = captions[:-1]
             mt = ''
-
+            
             if img_name is not None:
 
                 captions_ref = dataset.df[dataset.df["image"] == img_name[0]]["caption"]
@@ -167,7 +167,7 @@ class EncoderDecoder(nn.Module):
                     mt_score = sentence_bleu(captions_ref, captions)
 
                 mt = f"\nMT score: {mt_score:.2f}"
-
+            
             # print captions
             print("predicted caption :", captions)
             show_image(features_tensors[0], self.normalise, title=' '.join(captions) + mt)

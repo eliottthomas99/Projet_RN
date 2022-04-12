@@ -1,4 +1,5 @@
 import click
+from matplotlib import pyplot as plt
 import torch.nn as nn
 from PIL import Image
 from torch import optim
@@ -25,9 +26,10 @@ from utils import DEVICE, MODEL_PARAMS, NORMALISE, collate, plot_history
 @click.option("-t", "--tuna", default=0, help="default is 0")
 @click.option("-ld", "--load", default=None, help="path to the model to load")
 @click.option("-ip", "--img_path", default=None, help="path to the image to predict")
+@click.option("-t", "--test_path", default=None, help="path to the test set")
 @click.option("-att", "--disp_attention", default=0, help="default is 0")
 @click.option("-hist", "--plot_loss", default=0, help="default is 0")
-def main(extractor, data_path, batch_size, embed_size, attention_dim, decoder_dim, learning_rate, dropout, nb_img, epochs, tuna, load, img_path, disp_attention, plot_loss):
+def main(extractor, data_path, batch_size, embed_size, attention_dim, decoder_dim, learning_rate, dropout, nb_img, epochs, tuna, load, img_path, test_path, disp_attention, plot_loss):
     """
     Main function.
 
@@ -107,7 +109,29 @@ def main(extractor, data_path, batch_size, embed_size, attention_dim, decoder_di
 
         # Train model
         model.fit(data_loader, optimizer, loss, dataset)
+        
+        # Test model
+        if test_path is not None:
+            # Load data
+            dataset_test = DatasetLoader(
+                img_path=test_path + "/Images/",
+                captions_file=test_path + "/captions.txt",
+                normalise=NORMALISE,
+                nb_img=nb_img
+            )
+            dataset_test.build_vocab()
 
+            pad_idx_test = dataset_test.word2idx["<PAD>"]
+
+            data_loader_test = DataLoader(
+                dataset=dataset_test,
+                batch_size=batch_size,
+                num_workers=2,
+                shuffle=True,
+                collate_fn=lambda batch: collate(batch, pad_idx_test)
+            )
+            print(model.test(data_loader_test, loss))
+        
         # Plot loss history
         if plot_loss:
             plot_history(model.loss_history)
