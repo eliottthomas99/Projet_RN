@@ -1,5 +1,4 @@
 import click
-from matplotlib import pyplot as plt
 import torch.nn as nn
 from PIL import Image
 from torch import optim
@@ -108,8 +107,7 @@ def main(extractor, data_path, batch_size, embed_size, attention_dim, decoder_di
 
         # Train model
         model.fit(data_loader, optimizer, loss, dataset)
-        
-        
+
         # Plot loss history
         if plot_loss:
             plot_history(model.loss_history)
