@@ -8,13 +8,13 @@ from torch.utils.data import DataLoader
 from data_loader import DatasetLoader
 from encoder_decoder import EncoderDecoder
 from optisearch import optisearch
-from utils import DEVICE, MODEL_PARAMS, NORMALISE, collate
+from utils import DEVICE, MODEL_PARAMS, NORMALISE, collate, plot_history
 
 
 # Command line arguments
 @click.command()
 @click.argument("extractor", type=click.Choice(["vgg16", "resnet50", "inception_v3"]))
-@click.option("-dt", "--data_path", default="flickr8k/", help="default is flickr8k/")
+@click.option("-dt", "--data_path", default="data/flickr8k/", help="default is flickr8k/")
 @click.option("-bs", "--batch_size", default=32, help="default is 32")
 @click.option("-es", "--embed_size", default=300, help="default is 300")
 @click.option("-ad", "--attention_dim", default=256, help="default is 256")
@@ -27,8 +27,8 @@ from utils import DEVICE, MODEL_PARAMS, NORMALISE, collate
 @click.option("-ld", "--load", default=None, help="path to the model to load")
 @click.option("-ip", "--img_path", default=None, help="path to the image to predict")
 @click.option("-att", "--disp_attention", default=0, help="default is 0")
-@click.option("-hist", "--plot_history", default=0, help="default is 0")
-def main(extractor, data_path, batch_size, embed_size, attention_dim, decoder_dim, learning_rate, dropout, nb_img, epochs, tuna, load, img_path, disp_attention, plot_history):
+@click.option("-hist", "--plot_loss", default=0, help="default is 0")
+def main(extractor, data_path, batch_size, embed_size, attention_dim, decoder_dim, learning_rate, dropout, nb_img, epochs, tuna, load, img_path, disp_attention, plot_loss):
     """
     Main function.
 
@@ -50,8 +50,8 @@ def main(extractor, data_path, batch_size, embed_size, attention_dim, decoder_di
 
     # Load data
     dataset = DatasetLoader(
-        img_path=data_path + "Images/",
-        captions_file=data_path + "captions.txt",
+        img_path=data_path + "/Images/",
+        captions_file=data_path + "/captions.txt",
         normalise=NORMALISE,
         nb_img=nb_img
     )
@@ -111,9 +111,8 @@ def main(extractor, data_path, batch_size, embed_size, attention_dim, decoder_di
         
         
         # Plot loss history
-        if plot_history:
-            plt.plot(model.loss_history)
-            plt.show()
+        if plot_loss:
+            plot_history(model.loss_history)
 
         # Predict caption
         if img_path is not None:

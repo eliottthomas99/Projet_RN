@@ -219,7 +219,7 @@ class EncoderDecoder(nn.Module):
         """
         model_dict = torch.load(saved_path, map_location=torch.device(DEVICE))
         self.curr_epoch = model_dict["num_epochs"] + 1
-        self.loss_history = model_dict["loss_history"],
+        self.loss_history = model_dict["loss_history"]
         self.embed_size = model_dict["embed_size"]
         self.vocab_size = model_dict["vocab_size"]
         self.attention_dim = model_dict["attention_dim"]

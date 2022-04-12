@@ -114,3 +114,12 @@ def plot_attention(img, caption, alphas, normalise=False):
 
     plt.tight_layout()
     plt.show()
+
+def plot_history(history):
+    plt.figure(figsize=(10, 7))
+    
+    plt.plot(history)
+    plt.xlabel("iterations")
+    plt.ylabel("loss")
+    
+    plt.show()
