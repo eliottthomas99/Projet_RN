@@ -90,7 +90,6 @@ def main(extractor, data_path, batch_size, embed_size, attention_dim, decoder_di
     if tuna:
         optisearch(extractor, dataset, data_loader, loss, vocab_size, encoder_dim, epochs, NORMALISE)
     else:
-
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
         if load is not None:
@@ -114,6 +113,7 @@ def main(extractor, data_path, batch_size, embed_size, attention_dim, decoder_di
         # Plot loss history
         if plot_history:
             plt.plot(model.loss_history)
+            plt.show()
 
         # Predict caption
         if img_path is not None:

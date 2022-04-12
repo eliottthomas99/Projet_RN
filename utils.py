@@ -76,6 +76,7 @@ def show_image(img, normalise, title=None):
     if title is not None:
         plt.title(title)
     plt.imshow(img2)
+    plt.show()
 
 
 def plot_attention(img, caption, alphas, normalise=False):
