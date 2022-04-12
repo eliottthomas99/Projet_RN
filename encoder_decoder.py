@@ -26,20 +26,22 @@ class EncoderDecoder(nn.Module):
 
         super().__init__()
 
-        self.embed_size = embed_size
-        self.vocab_size = vocab_size
-        self.attention_dim = attention_dim
         self.encoder_dim = encoder_dim
+        self.vocab_size = vocab_size
+
+        self.extractor = extractor
+        self.attention_dim = attention_dim
+        self.embed_size = embed_size
         self.decoder_dim = decoder_dim
+        
         self.n_epochs = n_epochs
         self.curr_epoch = 1
         self.normalise = normalise
-        self.extractor = extractor
-        self.fit_date = None
-
         self.dropout = dropout
         self.vocab_size = vocab_size
-        self.encoder_dim = encoder_dim
+        
+        self.fit_date = None
+        self.loss_history = list()
 
         self.encoder = EncoderCNN(extractor)
 
@@ -89,6 +91,7 @@ class EncoderDecoder(nn.Module):
                 # Loss
                 targets = batch_captions[:, 1:]
                 loss = loss_criterion(outputs.view(-1, self.vocab_size), targets.reshape(-1))
+                self.loss_history.append(loss.item())
 
                 # Backward pass
                 loss.backward()
@@ -110,6 +113,28 @@ class EncoderDecoder(nn.Module):
 
         if loss is not None:
             return loss.item()
+    
+    def test(self, data_loader, loss_criterion):
+        """
+        Get mean loss of test dataset.
+
+        :param dataset_loader: DataLoader for test
+        :param loss_criterion: loss to use (cross entropy or other)
+        """
+        total_loss, test_size = 0, 0
+        for batch_images, batch_captions, _ in iter(data_loader):
+            batch_images, batch_captions = batch_images.to(DEVICE), batch_captions.to(DEVICE)
+
+            # Feed forward
+            outputs, _ = self.forward(batch_images, batch_captions)
+
+            # Loss
+            targets = batch_captions[:, 1:]
+            total_loss += loss_criterion(outputs.view(-1, self.vocab_size), targets.reshape(-1)).item()
+
+            test_size += 1
+
+        return total_loss / test_size
 
     def predict(self, features_tensors, dataset, img_name=None):
         """
@@ -124,7 +149,8 @@ class EncoderDecoder(nn.Module):
             features = self.encoder(features_tensors[0:1].to(DEVICE))
             captions, alphas = self.decoder.predict_caption(features, dataset.word2idx, dataset.idx2word)
             captions = captions[:-1]
-            mt = ""
+            mt = ''
+            
             if img_name is not None:
 
                 captions_ref = dataset.df[dataset.df["image"] == img_name[0]]["caption"]
@@ -141,6 +167,7 @@ class EncoderDecoder(nn.Module):
                     mt_score = sentence_bleu(captions_ref, captions)
 
                 mt = f"\nMT score: {mt_score:.2f}"
+            
             # print captions
             print("predicted caption :", captions)
             show_image(features_tensors[0], self.normalise, title=' '.join(captions) + mt)
@@ -172,6 +199,7 @@ class EncoderDecoder(nn.Module):
         """
         model_state = {
             "num_epochs": num_epochs,
+            "loss_history": self.loss_history,
             "embed_size": self.embed_size,
             "vocab_size": self.vocab_size,
             "attention_dim": self.attention_dim,
@@ -191,6 +219,7 @@ class EncoderDecoder(nn.Module):
         """
         model_dict = torch.load(saved_path, map_location=torch.device(DEVICE))
         self.curr_epoch = model_dict["num_epochs"] + 1
+        self.loss_history = model_dict["loss_history"],
         self.embed_size = model_dict["embed_size"]
         self.vocab_size = model_dict["vocab_size"]
         self.attention_dim = model_dict["attention_dim"]

@@ -7,7 +7,6 @@ from torch import manual_seed
 from torch.nn.utils.rnn import pad_sequence
 
 # Constants
-PATH = "flickr8k/"
 NORMALISE = True
 MODEL_PARAMS = {
     "vgg16": {

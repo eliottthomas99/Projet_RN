@@ -1,4 +1,5 @@
 import click
+from matplotlib import pyplot as plt
 import torch.nn as nn
 from PIL import Image
 from torch import optim
@@ -7,12 +8,13 @@ from torch.utils.data import DataLoader
 from data_loader import DatasetLoader
 from encoder_decoder import EncoderDecoder
 from optisearch import optisearch
-from utils import DEVICE, MODEL_PARAMS, NORMALISE, PATH, collate
+from utils import DEVICE, MODEL_PARAMS, NORMALISE, collate
 
 
 # Command line arguments
 @click.command()
 @click.argument("extractor", type=click.Choice(["vgg16", "resnet50", "inception_v3"]))
+@click.option("-dt", "--data_path", default="flickr8k/", help="default is flickr8k/")
 @click.option("-bs", "--batch_size", default=32, help="default is 32")
 @click.option("-es", "--embed_size", default=300, help="default is 300")
 @click.option("-ad", "--attention_dim", default=256, help="default is 256")
@@ -25,7 +27,8 @@ from utils import DEVICE, MODEL_PARAMS, NORMALISE, PATH, collate
 @click.option("-ld", "--load", default=None, help="path to the model to load")
 @click.option("-ip", "--img_path", default=None, help="path to the image to predict")
 @click.option("-att", "--disp_attention", default=0, help="default is 0")
-def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning_rate, dropout, nb_img, epochs, tuna, load, img_path, disp_attention):
+@click.option("-hist", "--plot_history", default=0, help="default is 0")
+def main(extractor, data_path, batch_size, embed_size, attention_dim, decoder_dim, learning_rate, dropout, nb_img, epochs, tuna, load, img_path, disp_attention, plot_history):
     """
     Main function.
 
@@ -47,8 +50,8 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
 
     # Load data
     dataset = DatasetLoader(
-        img_path=PATH + "Images/",
-        captions_file=PATH + "captions.txt",
+        img_path=data_path + "Images/",
+        captions_file=data_path + "captions.txt",
         normalise=NORMALISE,
         nb_img=nb_img
     )
@@ -94,18 +97,25 @@ def main(extractor, batch_size, embed_size, attention_dim, decoder_dim, learning
             model.load(load)
             model.to(DEVICE)
 
+        # Predict caption
         if img_path is not None:
-            print("Predicting:", img_path, "before training")
             # Image preprocessing
             img = Image.open(img_path)
             img = dataset.transform(img)
-
             img = img.unsqueeze(0)
+
+            print("Predicting:", img_path, "before training")
             _ = model.predict(img, dataset)
 
         # Train model
         model.fit(data_loader, optimizer, loss, dataset)
+        
+        
+        # Plot loss history
+        if plot_history:
+            plt.plot(model.loss_history)
 
+        # Predict caption
         if img_path is not None:
             print("Predicting:", img_path, "after training")
             _ = model.predict(img, dataset)
